@@ -1,11 +1,11 @@
-import visa
+import util.helper_visa as helper_visa
 import datetime
 
 class VisaEquipment():  # Super Class for Visa Equipment
 
     def __init__(self, device_name):
         self.device_name = device_name
-        self.rm = visa.ResourceManager('@py')
+        self.rm = helper_visa.ResourceManager('@py')
         self.mi = self.rm.open_resource(device_name)
 
     def command(self, cmd):
@@ -92,7 +92,7 @@ class VnaZnb(VisaEquipment):
 
     def initiate_calibration(self, cal_type):
         super().command("SENS1:CORR:COLL:AUTO:TYPE {}".format(cal_type))
-    
+
     def assign_calibration(self, test_port, cal_unit_port):
         super().command("SENS1:CORR:COLL:AUTO:ASS1:DEL:ALL")  # Deletes all available port assignments.
         super().command("SENS1:CORR:COLL:AUTO:ASS1:DEF {0}, {1}".format(test_port, cal_unit_port))
@@ -117,7 +117,7 @@ class VnaZnb(VisaEquipment):
         super().command("MMEM:STOR:TRAC:CHAN 1, '{0}', {1}, {2}".format(output_file, format_ind, format_type))
         super().command("HCOP:DEST 'MMEM'")
         super().command("HCOP")
-    
+
     def print_display(self, output_file):
         super().command("HCOP:DEV:LANG BMP")
         super().command("MMEM:NAME '{}'".format(output_file))

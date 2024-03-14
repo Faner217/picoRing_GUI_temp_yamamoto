@@ -14,7 +14,6 @@ from PyQt5.QtWidgets import *
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph as pg
 
-from test.test_picovna import *
 from util.peak_detector import *
 
 

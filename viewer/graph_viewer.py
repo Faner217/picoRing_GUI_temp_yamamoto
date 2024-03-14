@@ -20,7 +20,7 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         super().__init__(parent)
         self.winID = parent.winId()
 
-        self.font = QFont('Arial', 10)
+        self.font = QFont('Arial', 15)
 
         self.setStyleSheet(
             "QWidget {background-color: rgb(30,30,30); color: rgb(220, 230, 230)}"
@@ -31,7 +31,7 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         self.timelineGraph = pg.PlotWidget(background=(40, 40, 40))
 
         self.defaultGraphLayout = QHBoxLayout()
-        self.defaultGraphLayout.setSpacing(50)
+        # self.defaultGraphLayout.setSpacing(50)
         self.defaultGraphLayout.addWidget(self.rawGraph)
         self.defaultGraphLayout.addWidget(self.diffGraph)
         self.defaultGraphLayout.addWidget(self.timelineGraph)

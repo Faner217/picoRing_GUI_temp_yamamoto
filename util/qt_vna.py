@@ -5,7 +5,6 @@ import time
 from configparser import ConfigParser
 
 import numpy as np
-import win32com.client
 
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -13,6 +12,7 @@ from PyQt5.QtWidgets import *
 from superqt import QLabeledDoubleRangeSlider
 
 from util.peak_detector import *
+from util.nanovna import NanoVNA
 
 
 class QtVNA(QWidget):
@@ -124,24 +124,16 @@ class QtVNA(QWidget):
         self.end_freq = self.now_end_freq = self.start_freq + \
             self.freq_step * (self.step_num - 1)
         self.freq = np.arange(
-            self.start_freq, self.end_freq + self.freq_step, self.step_num)
+            self.start_freq, self.end_freq + self.freq_step/2, self.freq_step)
 
-        self.vna = win32com.client.Dispatch("PicoControl2.PicoVNA_2")
-        findVNA = self.vna.FND()
-        self.log_viewer.appendPlainText('PicoVNA {} loaded'.format(findVNA))
-
+        self.vna = NanoVNA()
+        self.vna.set_frequencies(
+            self.start_freq*1e6, self.end_freq*1e6, self.step_num)
+        self.vna.set_sweep(self.start_freq*1e6, self.end_freq*1e6)
         # load calibration file
-        ans = self.vna.LoadCal(
-            self.parser.get('VNA', 'calibration_file'))
-        self.log_viewer.appendPlainText("Result of LoadCal: {}".format(ans))
-
-        ans = self.vna.setFreqPlan(self.start_freq,
-                                   self.freq_step,
-                                   self.step_num,
-                                   self.input_power,
-                                   self.bandwidth)
-        self.log_viewer.appendPlainText(
-            "Result of setFreqPlan: {}".format(ans))
+        # ans = self.vna.LoadCal(
+        #    self.parser.get('VNA', 'calibration_file'))
+        # self.log_viewer.appendPlainText("Result of LoadCal: {}".format(ans))
 
         self.dB, self.base_dB, self.diff_dB, self.diff_dB_w_filter, self.std_dB, self.peaks = \
             None, None, None, None, None, None
@@ -173,14 +165,10 @@ class QtVNA(QWidget):
             return self.freq, self.raw_dB
 
         # Get S21 data from PicoVNA
-        self.vna.Measure("S21")
-        raw_dB = self.vna.GetData("S21", "logmag", 0)
-        splitdata_dB = raw_dB.split(',')
-        converteddata_dB = np.array(splitdata_dB)
-        converteddata_dB = converteddata_dB.astype(float)
-        freq = converteddata_dB[:: 2]/1e6
-        dB = converteddata_dB[1:: 2]
-        return freq, dB
+        self.vna.fetch_frequencies()
+        s21 = self.vna.data(1)
+        dB = 20 * np.log10(np.abs(s21))
+        return self.freq, dB
 
     def setupEnhance(self, smoo=1, bw=10000, ave=1):
         ans = self.vna.setEnhance("Smoo", smoo)
@@ -210,7 +198,7 @@ class QtVNA(QWidget):
         self.is_running = False
         time.sleep(0.1)
         if self.logfile == None:
-            self.vna.CloseVNA()
+            del self.vna
 
     def update(self, print_time=False):
         if not self.is_running:

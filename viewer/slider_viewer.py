@@ -75,7 +75,7 @@ class SliderViewer(QWidget):
             QFileInfo('video/test.wmv').absoluteFilePath()))
 
         self.mediaPlayer.setMedia(QMediaContent(
-            QUrl.fromLocalFile(QFileInfo('video/test.wmv').absoluteFilePath())))
+            QUrl.fromLocalFile(QFileInfo('video/test.mp4').absoluteFilePath())))
 
         self.slider_state_pre = None
 

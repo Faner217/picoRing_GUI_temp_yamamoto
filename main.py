@@ -49,12 +49,11 @@ class MainWindow(QMainWindow):
             qdarktheme.setup_theme()
             pass
 
-        self.setWindowTitle("mRing")
+        self.setWindowTitle("picoRing v2")
         # self.setWindowFlag(Qt.FramelessWindowHint)
-        screen = QApplication.primaryScreen().geometry()
-        self.setGeometry(0, 0, screen.width(), screen.height())
+        self.setGeometry(10, 10, 1400-10, 800-10)
 
-        self.default_font = QFont('Arial', 10)
+        self.default_font = QFont('Arial', 15)
         self.setFont(self.default_font)
 
         self.tabs = QTabWidget()
@@ -68,13 +67,13 @@ class MainWindow(QMainWindow):
         self.joystick_viewer = JoystickViewer(self, inifile=_inifile)
         self.tabs.addTab(self.vna, "VNA setup")
         self.tabs.addTab(self.graph_viewer, "S21 Graph")
-        self.tabs.addTab(self.sensor_viewer, "Sensor status")
-        self.tabs.addTab(self.switch_viewer, "Switch test (music player)")
-        self.tabs.addTab(self.slider_viewer, "Slider test (video player)")
-        self.tabs.addTab(self.scroll_viewer, "Scroll test (paper viewer)")
-        self.tabs.addTab(self.joystick_viewer,
-                         "Joystick test (game controller)")
-        self.tabs.setCurrentIndex(0)
+        # self.tabs.addTab(self.sensor_viewer, "Sensor status")
+        # self.tabs.addTab(self.switch_viewer, "Switch test (music player)")
+        # self.tabs.addTab(self.slider_viewer, "Slider test (video player)")
+        # self.tabs.addTab(self.scroll_viewer, "Scroll test (paper viewer)")
+        # self.tabs.addTab(self.joystick_viewer,
+        #                 "Joystick test (game controller)")
+        # self.tabs.setCurrentIndex(0)
 
         mainLayout = QGridLayout()
         mainLayout.addWidget(self.tabs, 1, 0)
@@ -174,9 +173,9 @@ def main():
     PyQt5.QtCore.qInstallMessageHandler(handler)
 
     app = QApplication(sys.argv)
-    main = MainWindow()
-    main.show()
-    main.setup()
+    window = MainWindow()
+    window.setup()
+    window.show()
 
     sys.exit(app.exec_())
 

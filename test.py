@@ -5,7 +5,6 @@ import sys
 import argparse
 
 
-import test.test_picovna as vna
 import test.test_animation_qt as qt
 import test.test_animation_matplotlib as mat
 

@@ -110,6 +110,44 @@ class QtVNA(QWidget):
         self.log_cnt = 1
         self.MAX_LOG_CNT = len(self.S21_log_data)
 
+
+    def _initZNBVNA(self):
+        self.parser = ConfigParser()
+        self.parser.read(self.inifile)
+
+        self.start_freq = self.now_start_freq = self.parser.getfloat(
+            'VNA', 'start_freq')
+        self.freq_step = self.parser.getfloat('VNA', 'freq_step')
+        self.step_num = self.parser.getint('VNA', 'step_num')
+        self.input_power = self.parser.getint('VNA', 'input_power')
+        self.bandwidth = self.parser.getint('VNA', 'bandwidth')
+        self.end_freq = self.now_end_freq = self.start_freq + \
+            self.freq_step * (self.step_num - 1)
+        self.freq = np.arange(
+            self.start_freq, self.end_freq + self.freq_step/2, self.freq_step)
+        self.dB, self.base_dB, self.diff_dB, self.diff_dB_w_filter, self.std_dB, self.peaks = \
+            None, None, None, None, None, None
+        self.fps = 0
+
+        self.vna = VnaZnb("TCPIP::169.254.227.231::INSTR")
+        self.vna.initial_process()
+        self.vna.set_port(log_port="1", phys_port="1")
+        self.vna.set_port(log_port="2", phys_port="2")
+        self.vna.set_freq_range(start_freq="27MHz", stop_freq="30MHz")
+        self.vna.set_freq_bandwidth(freq="10kHz")
+        self.vna.set_sweep_number(sweep_number="51")
+
+
+        self.vna.set_frequencies(
+            self.start_freq*1e6, self.end_freq*1e6, self.step_num)
+        self.vna.set_sweep(self.start_freq*1e6, self.end_freq*1e6)
+        # load calibration file
+        # ans = self.vna.LoadCal(
+        #    self.parser.get('VNA', 'calibration_file'))
+        # self.log_viewer.appendPlainText("Result of LoadCal: {}".format(ans))
+
+        # self.setupEnhance()
+
     def _initPicoVNA(self):
 
         self.parser = ConfigParser()
@@ -146,8 +184,13 @@ class QtVNA(QWidget):
 
     def setFreqRange(self, freq_range):
         target_start_freq, target_end_freq = freq_range
-        start_id = np.where(self.freq >= target_start_freq)[0][0]
-        end_id = np.where(self.freq >= target_end_freq)[0][0]
+        start_id = 0
+        end_id = self.step_num - 1
+        if np.where(self.freq >= target_start_freq)[0].size != 0:
+            start_id = np.where(self.freq >= target_start_freq)[0][0]
+        if np.where(self.freq >= target_end_freq)[0].size != 0:
+            end_id = np.where(self.freq >= target_end_freq)[0][0]
+
         self.now_start_freq = self.start_freq + self.freq_step * start_id
         self.now_end_freq = self.end_freq - \
             self.freq_step * (self.step_num - 1 - end_id)

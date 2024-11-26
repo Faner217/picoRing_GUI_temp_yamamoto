@@ -274,7 +274,7 @@ class GraphViewer(pg.GraphicsLayoutWidget):
             return
 
         now = datetime.datetime.now()
-        filename = 'log/s21_sw_data_{}{}{}{}'.format(
+        filename = 'log/s21_type1_on_{}{}{}{}'.format(
             now.month, now.day, now.hour, now.minute)
         np.save(filename, self.S21_log_data)
         self.S21_log_data = []

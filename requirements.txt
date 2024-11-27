@@ -1,6 +1,6 @@
 pyqt5
 pyqtgraph
-qdarktheme
+pyqtdarktheme
 suerqt
 pywin32
 matplotlib

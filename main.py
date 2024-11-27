@@ -4,7 +4,7 @@ import os
 import sys
 import time
 from argparse import ArgumentParser
-from pathvalidate.argparse import validate_filename_arg, validate_filepath_arg
+from pathvalidate.argparse import validate_filepath_arg
 
 import PyQt5
 from PyQt5.QtGui import *
@@ -67,7 +67,7 @@ class MainWindow(QMainWindow):
         self.joystick_viewer = JoystickViewer(self, inifile=_inifile)
         self.tabs.addTab(self.vna, "VNA setup")
         self.tabs.addTab(self.graph_viewer, "S21 Graph")
-        # self.tabs.addTab(self.sensor_viewer, "Sensor status")
+        self.tabs.addTab(self.sensor_viewer, "Sensor status")
         # self.tabs.addTab(self.switch_viewer, "Switch test (music player)")
         # self.tabs.addTab(self.slider_viewer, "Slider test (video player)")
         # self.tabs.addTab(self.scroll_viewer, "Scroll test (paper viewer)")

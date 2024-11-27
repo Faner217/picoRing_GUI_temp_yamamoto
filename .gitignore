@@ -135,8 +135,6 @@ dmypy.json
 desktop.ini
 log/
 *.profile
-!setting/default.ini
-setting/*.ini
 *.mp4
 !video/test.wmv
 wheels

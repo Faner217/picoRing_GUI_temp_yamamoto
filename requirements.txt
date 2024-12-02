@@ -4,6 +4,6 @@ pyqtdarktheme
 suerqt
 pywin32
 matplotlib
-wheels/numpy-1.22.4+mkl-cp38-cp38-win32.whl
-wheels/SciPy-1.8.1-cp38-cp38-win32.whl
+numpy
+scipy
 pandas

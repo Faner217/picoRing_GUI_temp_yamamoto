@@ -16,7 +16,7 @@ import pyqtgraph as pg
 from util.helper_func import *
 
 
-SENSOR_LIST = ['switch', 'slider', 'joystick', 'scroll']
+SENSOR_LIST = ['switch', 'slider', 'joystick', 'scroll','mouse']
 
 
 class SensorViewer(QWidget):

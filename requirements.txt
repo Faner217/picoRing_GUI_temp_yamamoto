@@ -1,9 +1,8 @@
 pyqt5
 pyqtgraph
 pyqtdarktheme
-suerqt
-pywin32
+superqt
 matplotlib
 numpy
-scipy
+SciPy
 pandas

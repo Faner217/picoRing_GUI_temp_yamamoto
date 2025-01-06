@@ -16,7 +16,7 @@ import pyqtgraph as pg
 from util.helper_func import *
 
 
-SENSOR_LIST = ['switch', 'slider', 'joystick', 'scroll','mouse']
+SENSOR_LIST = ['switch', 'slider', 'joystick', 'scroll', 'mouse']
 
 
 class SensorViewer(QWidget):
@@ -53,14 +53,18 @@ class SensorViewer(QWidget):
             self.status_label_dict[key] = QLabel('{} sensor: none'.format(key))
             self.status_label_dict[key].setFont(self.sensorFont)
             self.status_pic_dict[key] = QLabel()
+            self.status_pic_dict[key].setSizePolicy(
+                QSizePolicy.Expanding, QSizePolicy.Expanding)
+            self.status_pic_dict[key].setScaledContents(True)
             self.status_pic_dict[key].setPixmap(
                 self.PEAK_TABLE[key].img('none'))
+            self.status_pic_dict[key].setScaledContents(True)
             self.qt_table_dict[key] = self._createQtTable(self.PEAK_TABLE[key])
 
         self.current_sensor = SENSOR_LIST[0]
         self.sensorLayout = QVBoxLayout()
         self.sensorLayout.addWidget(
-            self.status_pic_dict[self.current_sensor], stretch=5, alignment=Qt.AlignCenter)
+            self.status_pic_dict[self.current_sensor], stretch=4, alignment=Qt.AlignCenter)
         self.sensorLayout.addWidget(
             self.status_label_dict[self.current_sensor], stretch=2, alignment=Qt.AlignCenter)
         self.sensorLayout.addWidget(
@@ -169,7 +173,8 @@ class SensorViewer(QWidget):
             key_list.append(key)
             peak_list.append(float(self.parser[section][key]))
 
-            img = QPixmap("./pictures/{}_{}.png".format(section, key))
+            img = QPixmap("./pictures/{}_{}.png".format(section, key)
+                          ).scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             img_dict[key] = img
 
         return self.Table(key_list, peak_list, img_dict, peak_range)
@@ -245,6 +250,7 @@ class SensorViewer(QWidget):
         if self.on_viewer:
             self.status_pic_dict[self.current_sensor].setPixmap(
                 self.PEAK_TABLE[self.current_sensor].img(sensor_info[self.current_sensor]))
+            self.status_pic_dict[self.current_sensor].setScaledContents(True)
             self.status_label_dict[self.current_sensor].setText(
                 '{} sensor: {}'.format(self.current_sensor, sensor_info[self.current_sensor]))
 

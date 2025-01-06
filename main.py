@@ -45,7 +45,6 @@ class MainWindow(QMainWindow):
         if options.logpath:
             _logfile = options.logpath
 
-
         self.setWindowTitle("picoRing v2")
         # self.setWindowFlag(Qt.FramelessWindowHint)
         # self.setGeometry(10, 10, 1400-10, 800-10)
@@ -65,7 +64,7 @@ class MainWindow(QMainWindow):
         self.slider_viewer = SliderViewer(self, inifile=_inifile)
         self.joystick_viewer = JoystickViewer(self, inifile=_inifile)
         self.tabs.addTab(self.vna, "VNA setup")
-        #self.tabs.addTab(self.graph_viewer, "S21 Graph")
+        self.tabs.addTab(self.graph_viewer, "S21 Graph")
         self.tabs.addTab(self.sensor_viewer, "Sensor status")
         # self.tabs.addTab(self.switch_viewer, "Switch test (music player)")
         # self.tabs.addTab(self.slider_viewer, "Slider test (video player)")

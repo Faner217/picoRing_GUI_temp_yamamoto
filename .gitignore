@@ -140,3 +140,4 @@ log/
 wheels
 .idea
 .vs_code
+.DS_Store

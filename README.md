@@ -9,9 +9,7 @@ picoRing is a **battery-free ring input device** for subtle finger input.
 
 ![GUI overview](./pictures/gui_overview.jpg)
 
-Intern project of Ryo Takahashi (2022.12 - 2023.05)
 
-[Slide](https://docs.google.com/presentation/d/1lEPZYM9NL1mrsxGhlgpK4VQmVgAp8BGL7EWGxqXmM9Q/edit?usp=share_link)
 
 ## Requirement
 

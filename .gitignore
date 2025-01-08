@@ -138,3 +138,5 @@ log/
 *.mp4
 !video/test.wmv
 wheels
+.idea
+.vs_code

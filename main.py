@@ -66,11 +66,11 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.vna, "VNA setup")
         self.tabs.addTab(self.graph_viewer, "S21 Graph")
         self.tabs.addTab(self.sensor_viewer, "Sensor status")
-        # self.tabs.addTab(self.switch_viewer, "Switch test (music player)")
-        # self.tabs.addTab(self.slider_viewer, "Slider test (video player)")
-        # self.tabs.addTab(self.scroll_viewer, "Scroll test (paper viewer)")
-        # self.tabs.addTab(self.joystick_viewer,
-        #                 "Joystick test (game controller)")
+        self.tabs.addTab(self.switch_viewer, "Switch test (music player)")
+        self.tabs.addTab(self.slider_viewer, "Slider test (video player)")
+        self.tabs.addTab(self.scroll_viewer, "Scroll test (paper viewer)")
+        self.tabs.addTab(self.joystick_viewer,
+                         "Joystick test (game controller)")
         # self.tabs.setCurrentIndex(0)
 
         mainLayout = QGridLayout()

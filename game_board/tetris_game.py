@@ -11,13 +11,15 @@ from PyQt5.QtWidgets import *
 class TetrisGame(QFrame):
     msgStatusbar = pyqtSignal(str)
 
-    BoardWidth = 8
+    BoardWidth = 12
     BoardHeight = 16
-    Speed = 500
+    Speed = 450
 
     def __init__(self, parent):
         super().__init__(parent)
 
+        self.game_counter = 0
+        self.game_counter_up = 0
         self.parent = parent
         self.isPaused = True
         self.setStyleSheet('background-color: rgb(10, 10, 10)')
@@ -107,7 +109,7 @@ class TetrisGame(QFrame):
             return
 
         key = event.key()
-
+        self.game_counter = self.game_counter + 1
         if key == Qt.Key_P:
             self.pause()
         elif key == Qt.Key_J:
@@ -125,13 +127,29 @@ class TetrisGame(QFrame):
 
     def updateState(self, state):
         if state == 'left':
-            self.tryMove(self.curPiece, self.curX - 1, self.curY)
+            if self.game_counter > 3:
+                self.tryMove(self.curPiece, self.curX - 1, self.curY)
+                self.game_counter = 0
+            else:
+                self.game_counter = self.game_counter + 1
         elif state == 'right':
-            self.tryMove(self.curPiece, self.curX + 1, self.curY)
+            if self.game_counter > 3:
+                self.tryMove(self.curPiece, self.curX + 1, self.curY)
+                self.game_counter = 0
+            else:
+                self.game_counter = self.game_counter + 1
         elif state == 'down':
-            self.tryMove(self.curPiece.rotateRight(), self.curX, self.curY)
+            if self.game_counter_up > 6:
+                self.tryMove(self.curPiece.rotateRight(), self.curX, self.curY)
+                self.game_counter_up = 0
+            else:
+                self.game_counter_up = self.game_counter_up + 1
         elif state == 'up':
-            self.tryMove(self.curPiece.rotateLeft(), self.curX, self.curY)
+            if self.game_counter_up > 6:
+                self.tryMove(self.curPiece.rotateLeft(), self.curX, self.curY)
+                self.game_counter_up = 0
+            else:
+                self.game_counter_up = self.game_counter_up + 1
 
     def timerEvent(self, event):
         """handles timer event"""

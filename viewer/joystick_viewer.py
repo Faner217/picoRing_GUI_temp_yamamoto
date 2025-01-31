@@ -20,15 +20,15 @@ class JoystickViewer(QWidget):
     def __init__(self, parent, inifile='setting/default.ini'):
         super().__init__(parent)
 
-        self.font = QFont('Arial', 12)
-        self.boldFont = QFont('Arial', 12)
+        self.font = QFont('Arial', 24)
+        self.boldFont = QFont('Arial', 24)
 
         self.window_geometry = parent.geometry()
         self.window_w, self.window_h = self.window_geometry.width(
         ), self.window_geometry.height()
-        img_size = 800
-        self.img_rect = QRect(self.window_w - img_size - 300,
-                              300, img_size, img_size)
+        img_size = 500
+        self.img_rect = QRect(self.window_w - img_size + 200,
+                              10, img_size, img_size)
 
         self.game_board = {}
         self.current_game = 'snake'
@@ -61,7 +61,7 @@ class JoystickViewer(QWidget):
 
         self.parser = ConfigParser()
         self.parser.read(inifile)
-        section = 'joystick'
+        section = 'mouse'
         self.img_dict = {}
         for key in self.parser[section]:
             if key == 'range':
@@ -100,7 +100,7 @@ class JoystickViewer(QWidget):
         elif self.current_game == 'tetris':
             game_screen = QRect(
                 int((screen.width() - screen.height()/2)/2), screen.top(),
-                screen.height()/2, screen.height())
+                screen.height()*0.75, screen.height())
         self.game_board[self.current_game].setGeometry(game_screen)
         self.game_board[self.current_game].start()
 
@@ -113,7 +113,7 @@ class JoystickViewer(QWidget):
         self.startButton.setEnabled(True)
 
     def updateJoystickState(self, sensor_info):
-        self.joystick_state = sensor_info['joystick']
+        self.joystick_state = sensor_info['mouse']
         self.statusbar.showMessage(
             'joystick state: {}'.format(self.joystick_state))
         self.game_board[self.current_game].updateState(self.joystick_state)

@@ -102,21 +102,27 @@ class SwitchViewer(QWidget):
             self.setPosition(position=0)
 
     def updateMusicState(self, sensor_info):
-        switch_state = sensor_info['switch']
+        switch_state = sensor_info['mouse']
         self.statusbar.showMessage('switch state: {}'.format(switch_state))
 
         if self.pre_switch_state == None:
             self.pre_switch_state = switch_state
             return
 
-        if switch_state == 'on':
+        if switch_state == 'press': #on
             self.switch_on_cnt = self.switch_on_cnt + 1
+            if self.switch_on_cnt > 10:
+                self.play()
+                self.switch_on_cnt = 0
             return
 
-        if switch_state == 'off':
-            if self.switch_on_cnt > 30:
-                self.setPosition(position=0)
-            elif self.switch_on_cnt > 2:
-                self.play()
+        if switch_state == 'none': #off
+            # self.setPosition(position=0)
+            # if self.switch_on_cnt > 100:
+            #     self.setPosition(position=0)
+            # elif self.switch_on_cnt > 2:
+            #     self.play()
+            #     self.switch_on_cnt = 0
             print(self.switch_on_cnt)
-            self.switch_on_cnt = 0
+
+            #self.switch_on_cnt = 0

@@ -19,7 +19,7 @@ picoRing is a **battery-free ring input device** for subtle finger input.
 ### Python
 
 ```
-py -3.8-32 -m pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 - PicoVNA 2 software

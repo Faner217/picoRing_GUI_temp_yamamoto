@@ -38,20 +38,22 @@ class ScrollViewer(QWidget):
         self.scroll_pic.setPixmap(self.img_dict['none'])
 
         self.mainLayout = QHBoxLayout()
-        self.mainLayout.addWidget(
-            self.scroll_pic, alignment=Qt.AlignCenter | Qt.AlignTop, stretch=1)
+        # self.mainLayout.addWidget(
+        #     self.scroll_pic, alignment=Qt.AlignCenter | Qt.AlignTop, stretch=1)
         self.mainLayout.addWidget(
             self.paper, alignment=Qt.AlignCenter, stretch=4)
 
         self.window_geometry = parent.geometry()
         self.window_w, self.window_h = self.window_geometry.width(
-        ), self.window_geometry.height() - 200
-        self.original_img = QPixmap("./pictures/yokohama.jpg")
-        self.original_img = self.original_img.scaledToWidth(
-            int(self.window_w * 2.5 / 4))
+        ) - 400, self.window_geometry.height()
+
+        self.original_img = QPixmap("./pictures/map2.png")
+        #self.original_img = self.original_img.scaledToWidth(
+        #    int(self.window_w * 2.5 / 4))
         self.img_w, self.img_h = self.original_img.width(), self.original_img.height()
 
-        self.offset_h = 0
+        self.offset_h = 500
+        self.offset_w = 500
         self.scroll_angle_pre = self.scroll_angle_now = None
         self.current_angle = 0
         self.current_img = self._renewCropImg()
@@ -87,14 +89,26 @@ class ScrollViewer(QWidget):
         # self.scroll_angle_pre = self.scroll_angle_now
 
         if scroll_state == 'up':
-            if self.scroll_counter > 2:
-                self.offset_h = self.offset_h - 200
+            if self.scroll_counter > 1:
+                self.offset_h = self.offset_h - 50
                 self.scroll_counter = 0
             else:
                 self.scroll_counter = self.scroll_counter + 1
         elif scroll_state == 'down':
-            if self.scroll_counter > 2:
-                self.offset_h = self.offset_h + 200
+            if self.scroll_counter > 1:
+                self.offset_h = self.offset_h + 50
+                self.scroll_counter = 0
+            else:
+                self.scroll_counter = self.scroll_counter + 1
+        elif scroll_state == 'left':
+            if self.scroll_counter > 1:
+                self.offset_w = self.offset_w - 50
+                self.scroll_counter = 0
+            else:
+                self.scroll_counter = self.scroll_counter + 1
+        elif scroll_state == 'right':
+            if self.scroll_counter > 1:
+                self.offset_w = self.offset_w + 50
                 self.scroll_counter = 0
             else:
                 self.scroll_counter = self.scroll_counter + 1
@@ -109,8 +123,9 @@ class ScrollViewer(QWidget):
 
     def _renewCropImg(self):
         self._renewOffsetH()
+        self._renewOffsetW()
         cropped_area = QRect(
-            0, self.offset_h, self.window_w, self.window_h)
+            self.offset_w, self.offset_h, self.window_w, self.window_h)
         self.current_img = self.original_img.copy(cropped_area)
         self.paper.setPixmap(self.current_img)
 
@@ -118,15 +133,27 @@ class ScrollViewer(QWidget):
         self.offset_h = self.offset_h if self.offset_h + \
             self.window_h < self.img_h else self.img_h - self.window_h
         self.offset_h = self.offset_h if self.offset_h >= 0 else 0
+    def _renewOffsetW(self):
+        self.offset_w = self.offset_w if self.offset_w + \
+            self.window_w < self.img_w else self.img_w - self.window_w
+        self.offset_w = self.offset_w if self.offset_w >= 0 else 0
+    def _renewOffsets(self):
+        self.offset_h = min(max(self.offset_h, 0), self.img_h - self.window_h)
+        self.offset_w = min(max(self.offset_w, 0), self.img_w - self.window_w)
 
     @pyqtSlot(QKeyEvent)
     def onKeyPressEvent(self, event: QKeyEvent):
-        if event.key() == Qt.Key_K:
-            self.offset_h = self.offset_h - 500
-        elif event.key() == Qt.Key_J:
-            self.offset_h = self.offset_h + 500
+        if event.key() == Qt.Key_Down:
+            self.offset_h = self.offset_h + 50
+        elif event.key() == Qt.Key_Up:
+            self.offset_h = self.offset_h - 50
+        elif event.key() == Qt.Key_Left:
+            self.offset_w = self.offset_w - 50
+        elif event.key() == Qt.Key_Right:
+            self.offset_w = self.offset_w + 50
         elif event.key() == Qt.Key_Space:
             self.offset_h = 0
+            self.offset_w = 0
 
         self._renewCropImg()
 

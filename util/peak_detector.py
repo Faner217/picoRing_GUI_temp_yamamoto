@@ -12,7 +12,7 @@ from numpy.lib.stride_tricks import sliding_window_view
 def _detect_sensor_peak(diff_data, peak_kind='max_only'):
 
     peak_ids, _ = sig.find_peaks(
-        diff_data, prominence=(0.1, 9.0), width=(0.1, 10))
+        diff_data, prominence=(0.1, 50.0), width=(0.1, 50))
 
     if peak_kind == 'max_only' and len(peak_ids) > 0:
         max_peak_id = np.argmax(diff_data[peak_ids])

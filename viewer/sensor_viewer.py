@@ -61,14 +61,14 @@ class SensorViewer(QWidget):
             self.status_pic_dict[key].setScaledContents(True)
             self.qt_table_dict[key] = self._createQtTable(self.PEAK_TABLE[key])
 
-        self.current_sensor = SENSOR_LIST[0]
+        self.current_sensor = SENSOR_LIST[4]
         self.sensorLayout = QVBoxLayout()
         self.sensorLayout.addWidget(
             self.status_pic_dict[self.current_sensor], stretch=4, alignment=Qt.AlignCenter)
-        self.sensorLayout.addWidget(
-            self.status_label_dict[self.current_sensor], stretch=2, alignment=Qt.AlignCenter)
-        self.sensorLayout.addWidget(
-            self.qt_table_dict[self.current_sensor], stretch=3)
+        # self.sensorLayout.addWidget(
+        #     self.status_label_dict[self.current_sensor], stretch=2, alignment=Qt.AlignCenter)
+        # self.sensorLayout.addWidget(
+        #     self.qt_table_dict[self.current_sensor], stretch=3)
 
         self.comboLabel = QLabel('Choose sensor type:')
         self.comboLabel.setFont(self.boldFont)
@@ -118,17 +118,18 @@ class SensorViewer(QWidget):
         self.controlLayout.setSpacing(10)
 
         green = QColor(52, 235, 143)
+        blue = QColor(0, 0, 255)
         text = QColor(50, 50, 50) if dark_mode else QColor(10, 10, 10)
         # pg.setConfigOption('foreground', 'k')
         self.timelineGraph = pg.PlotWidget(background=(
             30, 30, 30)) if dark_mode else pg.PlotWidget(background=(250, 250, 255))
         self.timelineGraph.addLegend()
-        pen = pg.mkPen(green, width=5, style=Qt.SolidLine)
+        pen = pg.mkPen(blue, width=7, style=Qt.SolidLine)
         self.peak_timeline = self.timelineGraph.plot(
             [], [], pen=pen, viewbox=None)
 
         self.peak_scatter_in_timeline = pg.ScatterPlotItem(
-            size=20, brush=pg.mkBrush(green))
+            size=20, brush=pg.mkBrush(blue))
         self.timelineGraph.addItem(self.peak_scatter_in_timeline)
         self.timelineGraph.setLabel("left", "Peak (MHz)")
         self.timelineGraph.setLabel("bottom", "Count")
@@ -139,7 +140,7 @@ class SensorViewer(QWidget):
         self.peakLabel.anchor(itemPos=(1, 0), parentPos=(1, 0), offset=(0, 0))
 
         self.cnt = 0
-        self.MAX_CNT = 200
+        self.MAX_CNT = 100
         self.timeline_x = np.arange(0, self.MAX_CNT, 1)
         self.timeline_y = np.zeros(self.MAX_CNT)
         self.peak_timeline.setData(self.timeline_x, self.timeline_y)
@@ -147,7 +148,7 @@ class SensorViewer(QWidget):
         self.timelineGraph.showGrid(x=True, y=True)
 
         self.sensorinfoLayout = QVBoxLayout()
-        self.sensorinfoLayout.addLayout(self.sensorLayout, stretch=4)
+        self.sensorinfoLayout.addLayout(self.sensorLayout, stretch=5)
         self.sensorinfoLayout.addLayout(self.controlLayout, stretch=1)
 
         self.mainLayout = QHBoxLayout()
@@ -174,7 +175,7 @@ class SensorViewer(QWidget):
             peak_list.append(float(self.parser[section][key]))
 
             img = QPixmap("./pictures/{}_{}.png".format(section, key)
-                          ).scaled(300, 300, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                          ).scaled(600, 600, Qt.KeepAspectRatio, Qt.SmoothTransformation)
             img_dict[key] = img
 
         return self.Table(key_list, peak_list, img_dict, peak_range)
@@ -220,6 +221,8 @@ class SensorViewer(QWidget):
                 self.freq[0], self.freq[-1], padding=0.05)
             peak = self.target_freq[self.peaks] if len(
                 self.peaks) else np.array([self.freq[0]])
+            # peak = np.where(peak < 27.8, 27.4, peak)#27.4#
+            # peak = np.where(peak > 27.81, 28.45, peak)
             self.timeline_y[self.cnt % self.MAX_CNT] = peak
             self.peak_timeline.setData(self.timeline_x, self.timeline_y)
             self.peak_scatter_in_timeline.setData([self.timeline_x[self.cnt % self.MAX_CNT]],
@@ -325,10 +328,10 @@ class SensorViewer(QWidget):
 
         self.sensorLayout.addWidget(
             self.status_pic_dict[self.current_sensor], stretch=5, alignment=Qt.AlignCenter)
-        self.sensorLayout.addWidget(
-            self.status_label_dict[self.current_sensor], stretch=2, alignment=Qt.AlignCenter)
-        self.sensorLayout.addWidget(
-            self.qt_table_dict[self.current_sensor], stretch=3)
+        # self.sensorLayout.addWidget(
+        #     self.status_label_dict[self.current_sensor], stretch=2, alignment=Qt.AlignCenter)
+        # self.sensorLayout.addWidget(
+        #     self.qt_table_dict[self.current_sensor], stretch=3)
 
     def _findState(self, peak, sensor_type):
         itable = self.PEAK_TABLE[sensor_type]

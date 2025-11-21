@@ -72,10 +72,12 @@ class SliderViewer(QWidget):
         self.setLayout(self.mainLayout)
 
         self.statusbar.showMessage('Ready to play {}'.format(
-            QFileInfo('video/test.wmv').absoluteFilePath()))
+            QFileInfo('picoRing_mouse_v2.mp4').absoluteFilePath()))
 
+        # self.mediaPlayer.setMedia(QMediaContent(
+        #     QUrl.fromLocalFile(QFileInfo('picoRing_mouse_v2.mp4').absoluteFilePath())))
         self.mediaPlayer.setMedia(QMediaContent(
-            QUrl.fromLocalFile(QFileInfo('video/test.mp4').absoluteFilePath())))
+            QUrl.fromLocalFile('/Users/faner/picoRing_GUI_with_VNA_v5/video/picoRing_mouse_v2.mp4')))
 
         self.slider_state_pre = None
 
@@ -131,21 +133,22 @@ class SliderViewer(QWidget):
             self.slider_state_pre = slider_state
             return
 
-        if slider_state == 'center' and self.slider_state_pre == 'press':
+        if slider_state == 'press' and self.slider_state_pre == 'none':
             self.play()
-            print('test')
-        elif slider_state == 'strong_left':
-            pos = self.positionSlider.value()
-            self.setPosition(pos - 2000)
-        elif slider_state == 'strong_right':
-            pos = self.positionSlider.value()
-            self.setPosition(pos + 2000)
-        elif slider_state == 'weak_left':
-            pos = self.positionSlider.value()
-            self.setPosition(pos - 1000)
-        elif slider_state == 'weak_right':
-            pos = self.positionSlider.value()
-            self.setPosition(pos + 1000)
+            #print('test')
+            time.sleep(0.4)
+        # elif slider_state == 'strong_left':
+        #     pos = self.positionSlider.value()
+        #     self.setPosition(pos - 2000)
+        # elif slider_state == 'strong_right':
+        #     pos = self.positionSlider.value()
+        #     self.setPosition(pos + 2000)
+        # elif slider_state == 'weak_left':
+        #     pos = self.positionSlider.value()
+        #     self.setPosition(pos - 1000)
+        # elif slider_state == 'weak_right':
+        #     pos = self.positionSlider.value()
+        #     self.setPosition(pos + 1000)
 
         self.slider_pic.setPixmap(self.img_dict[slider_state])
         self.slider_state_pre = slider_state

@@ -331,3 +331,4 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         self.is_recording = True
         self.recordButton.setEnabled(False)
         self.S21_log_data.append(self.freq)
+

@@ -28,7 +28,7 @@ class JoystickViewer(QWidget):
         ), self.window_geometry.height()
         img_size = 500
         self.img_rect = QRect(self.window_w - img_size + 200,
-                              10, img_size, img_size)
+                              100, img_size, img_size)
 
         self.game_board = {}
         self.current_game = 'snake'
@@ -96,7 +96,7 @@ class JoystickViewer(QWidget):
         if self.current_game == 'snake':
             game_screen = QRect(
                 int((screen.width() - screen.height())/2), screen.top(),
-                screen.height(), screen.height())
+                screen.height()*0.75, screen.height())
         elif self.current_game == 'tetris':
             game_screen = QRect(
                 int((screen.width() - screen.height()/2)/2), screen.top(),

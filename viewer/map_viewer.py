@@ -21,6 +21,8 @@ class MapViewer(QWidget):
         self.window_geometry = parent.geometry()
         self.window_w, self.window_h = self.window_geometry.width(
         ), self.window_geometry.height() - 200
+        self.window_w = 300
+        self.window_h = 500
         self.offset_w = 0
         self.offset_h = 0
         self.scroll_angle_pre = self.scroll_angle_now = None
@@ -46,9 +48,9 @@ class MapViewer(QWidget):
     @pyqtSlot(QKeyEvent)
     def onKeyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key_K:
-            self.offset_h = self.offset_h - 100
+            self.offset_h = self.offset_h - 200
         elif event.key() == Qt.Key_J:
-            self.offset_h = self.offset_h + 100
+            self.offset_h = self.offset_h + 200
         elif event.key() == Qt.Key_Space:
             self.offset_h = 0
 

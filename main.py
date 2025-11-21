@@ -11,13 +11,16 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
+from viewer.book_viewer import *
 from viewer.graph_viewer import *
 from viewer.sensor_viewer import *
 from viewer.switch_viewer import *
 from viewer.slider_viewer import *
 from viewer.scroll_viewer import *
 from viewer.joystick_viewer import *
-
+from viewer.email_viewer import *
+from game_board.snake_game import *
+# from viewer.map_viewer import *
 from util.qt_vna import *
 
 import qdarktheme
@@ -63,6 +66,10 @@ class MainWindow(QMainWindow):
         self.scroll_viewer = ScrollViewer(self, inifile=_inifile)
         self.slider_viewer = SliderViewer(self, inifile=_inifile)
         self.joystick_viewer = JoystickViewer(self, inifile=_inifile)
+        self.snake_viewer = SnakeGame(self)
+        self.book_viewer = BookViewer(self)
+        self.email_viewer = EmailViewer(self)
+        # self.map_viewer = MapViewer(self)
         self.tabs.addTab(self.vna, "VNA setup")
         self.tabs.addTab(self.graph_viewer, "S21 Graph")
         self.tabs.addTab(self.sensor_viewer, "Sensor status")
@@ -71,10 +78,15 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.scroll_viewer, "Scroll test (paper viewer)")
         self.tabs.addTab(self.joystick_viewer,
                          "Joystick test (game controller)")
+        self.tabs.addTab(self.book_viewer, "Scroll test (book viewer)")
+        self.tabs.addTab(self.email_viewer, "Scroll test (email viewer)")
+        # self.tabs.addTab(self.map_viewer, "map test (paper viewer)")
         # self.tabs.setCurrentIndex(0)
 
         mainLayout = QGridLayout()
+        self.tetrisGame = TetrisGame(self)
         mainLayout.addWidget(self.tabs, 1, 0)
+        mainLayout.addWidget(self.tetrisGame, 2, 0)
         widget = QWidget()
         widget.setLayout(mainLayout)
         self.setCentralWidget(widget)
@@ -93,6 +105,9 @@ class MainWindow(QMainWindow):
         self.key_pressed.connect(self.scroll_viewer.onKeyPressEvent)
         self.key_pressed.connect(self.slider_viewer.onKeyPressEvent)
         self.key_pressed.connect(self.joystick_viewer.onKeyPressEvent)
+        self.key_pressed.connect(self.book_viewer.onKeyPressEvent)
+        self.key_pressed.connect(self.email_viewer.onKeyPressEvent)
+        self.key_pressed.connect(self.snake_viewer.onKeyPressEvent)
 
     def setup(self):
         self.vna.initVNA()
@@ -127,6 +142,7 @@ class MainWindow(QMainWindow):
         self.slider_viewer.pause()
         self.scroll_viewer.pause()
         self.joystick_viewer.pause()
+        #self.map_viewer.pause()
 
         if id == 0:
             self.statusBar().showMessage('')
@@ -153,6 +169,15 @@ class MainWindow(QMainWindow):
         elif id == 6:
             self.sensor_viewer.sensor_info_signal.connect(
                 self.joystick_viewer.updateJoystickState)
+        elif id == 7:
+            self.sensor_viewer.sensor_info_signal.connect(
+                self.book_viewer.updateBookPos)
+        elif id == 8:
+            self.sensor_viewer.sensor_info_signal.connect(
+                self.email_viewer.updateEmailPos)
+        # elif id == 7:
+        #     self.sensor_viewer.sensor_info_signal.connect(
+        #         self.map_viewer.updateMapPos)
             # self.sensor_viewer.sensor_info_signal.connect(
             #    self.joystick_viewer.updateJoystickFig)
 

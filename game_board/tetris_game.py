@@ -13,13 +13,15 @@ class TetrisGame(QFrame):
 
     BoardWidth = 12
     BoardHeight = 16
-    Speed = 450
+    Speed = 350
 
     def __init__(self, parent):
         super().__init__(parent)
 
         self.game_counter = 0
         self.game_counter_up = 0
+        self.game_counter_left = 0
+        self.game_counter_right = 0
         self.parent = parent
         self.isPaused = True
         self.setStyleSheet('background-color: rgb(10, 10, 10)')
@@ -112,44 +114,50 @@ class TetrisGame(QFrame):
         self.game_counter = self.game_counter + 1
         if key == Qt.Key_P:
             self.pause()
-        elif key == Qt.Key_J:
+        elif key == Qt.Key_A:
             self.tryMove(self.curPiece, self.curX - 1, self.curY)
-        elif key == Qt.Key_K:
-            self.tryMove(self.curPiece, self.curX + 1, self.curY)
-        elif key == Qt.Key_N:
-            self.tryMove(self.curPiece.rotateRight(), self.curX, self.curY)
-        elif key == Qt.Key_U:
-            self.tryMove(self.curPiece.rotateLeft(), self.curX, self.curY)
         elif key == Qt.Key_D:
+            self.tryMove(self.curPiece, self.curX + 1, self.curY)
+        elif key == Qt.Key_W:
+            self.tryMove(self.curPiece.rotateRight(), self.curX, self.curY)
+        elif key == Qt.Key_S:
+            self.tryMove(self.curPiece.rotateLeft(), self.curX, self.curY)
+        elif key == Qt.Key_Space:
             self.dropDown()
 
         event.accept()
 
     def updateState(self, state):
         if state == 'left':
-            if self.game_counter > 3:
+            if self.game_counter_left > 8:
                 self.tryMove(self.curPiece, self.curX - 1, self.curY)
-                self.game_counter = 0
+                self.game_counter_left = 0
             else:
-                self.game_counter = self.game_counter + 1
+                self.game_counter_left = self.game_counter_left + 1
         elif state == 'right':
-            if self.game_counter > 3:
+            if self.game_counter_right > 8:
                 self.tryMove(self.curPiece, self.curX + 1, self.curY)
-                self.game_counter = 0
+                self.game_counter_right = 0
             else:
-                self.game_counter = self.game_counter + 1
-        elif state == 'down':
-            if self.game_counter_up > 6:
-                self.tryMove(self.curPiece.rotateRight(), self.curX, self.curY)
-                self.game_counter_up = 0
-            else:
-                self.game_counter_up = self.game_counter_up + 1
+                self.game_counter_right = self.game_counter_right + 1
         elif state == 'up':
-            if self.game_counter_up > 6:
+            if self.game_counter_up > 12:
                 self.tryMove(self.curPiece.rotateLeft(), self.curX, self.curY)
                 self.game_counter_up = 0
             else:
                 self.game_counter_up = self.game_counter_up + 1
+        # elif state == 'press':
+        #     if self.game_counter_up > 8:
+        #         self.tryMove(self.curPiece.rotateRight(), self.curX, self.curY)
+        #         self.game_counter_up = 0
+        #     else:
+        #         self.game_counter_up = self.game_counter_up + 1
+        # elif state == 'up':
+        #     if self.game_counter_up > 6:
+        #         self.tryMove(self.curPiece.rotateLeft(), self.curX, self.curY)
+        #         self.game_counter_up = 0
+        #     else:
+        #         self.game_counter_up = self.game_counter_up + 1
 
     def timerEvent(self, event):
         """handles timer event"""

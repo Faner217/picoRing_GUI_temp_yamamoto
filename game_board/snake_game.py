@@ -14,7 +14,7 @@ class SnakeGame(QFrame):
     # speed of the snake
     SPEED = 200
     # block width and height
-    WIDTHINBLOCKS = 20
+    WIDTHINBLOCKS = 20*0.75
     HEIGHTINBLOCKS = 20
 
     def __init__(self, parent):
@@ -97,18 +97,18 @@ class SnakeGame(QFrame):
             self.direction = 4
 
     @pyqtSlot(QKeyEvent)
-    def onKeyPressEvent(self, event):
+    def onKeyPressEvent(self, event: QKeyEvent):
         if self.isPaused:
             event.accept()
 
         key = event.key()
-        if key == Qt.Key_J:
+        if key == Qt.Key_A:
             self.direction = 1
-        elif key == Qt.Key_K:
+        elif key == Qt.Key_D:
             self.direction = 2
-        elif key == Qt.Key_N:
+        elif key == Qt.Key_S:
             self.direction = 3
-        elif key == Qt.Key_U:
+        elif key == Qt.Key_W:
             self.direction = 4
         event.accept()
 

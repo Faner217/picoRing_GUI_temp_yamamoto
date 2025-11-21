@@ -10,3 +10,4 @@ pyserial~=3.5
 pathvalidate~=3.2.3
 deprecation~=2.1.0
 argparse~=1.4.0
+qdarktheme

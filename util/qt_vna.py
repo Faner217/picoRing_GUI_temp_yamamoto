@@ -85,6 +85,21 @@ class QtVNA(QWidget):
     def initVNA(self):
         self.vna = None
         print('Open VNA')
+        # Read S-parameter mode from ini if available (S21 by default)
+        self.sparam = 'S21'
+        if self.inifile:
+            try:
+                _p = ConfigParser()
+                _p.read(self.inifile)
+                self.sparam = _p.get('VNA', 'sparam', fallback='S21').strip().upper()
+            except Exception:
+                # fallback to default
+                self.sparam = 'S21'
+        # Inform user which S-parameter is being used
+        try:
+            self.log_viewer.appendPlainText("Measurement parameter: {}".format(self.sparam))
+        except Exception:
+            pass
         if self.logfile:
             self._initLogVNA()
         else:
@@ -102,6 +117,8 @@ class QtVNA(QWidget):
     def _initLogVNA(self):
         self.S21_log_data = np.load(self.logfile)
         self.log_viewer.appendPlainText("Replaying {}".format(self.logfile))
+        # Note: log replay will use whatever parameter the log contains.
+        self.log_viewer.appendPlainText("Replaying mode: {} (log data assumed to match)".format(getattr(self, 'sparam', 'S21')))
         self.freq = self.S21_log_data[0]
         self.start_freq = self.now_start_freq = self.freq[0]
         self.end_freq = self.now_end_freq = self.freq[-1]
@@ -152,6 +169,9 @@ class QtVNA(QWidget):
 
         self.parser = ConfigParser()
         self.parser.read(self.inifile)
+
+        # read which S-parameter to fetch (S21 by default). User can set `sparam = S11` or `S21`
+        self.sparam = self.parser.get('VNA', 'sparam', fallback='S21').strip().upper()
 
         self.start_freq = self.now_start_freq = self.parser.getfloat(
             'VNA', 'start_freq')
@@ -209,8 +229,11 @@ class QtVNA(QWidget):
 
         # Get S21 data from PicoVNA
         self.vna.fetch_frequencies()
-        s21 = self.vna.data(1)
-        dB = 20 * np.log10(np.abs(s21))
+        # Select trace index according to chosen S-parameter: S11 -> 0, S21 -> 1
+        idx = 0 if getattr(self, 'sparam', 'S21') == 'S11' else 1
+        s = self.vna.data(idx)
+        # Convert complex S-parameter to dB magnitude
+        dB = 20 * np.log10(np.abs(s))
         return self.freq, dB
 
     def setupEnhance(self, smoo=1, bw=10000, ave=1):

@@ -48,7 +48,7 @@ py -3.8-32 -m pip install -r requirements.txt
 ```
 py -3.8-32 main.py # activate qt viewer
 py -3.8-32 main.py -f sample_log/s21_press_ring.npy # replay log data with qt viewer
-py -3.8-32 main.py -i setting/default.ini # use the specific setting file
+python3 main.py -i setting/default.ini # use the specific setting file
 py -3.8-32 main.py -d # start with dark mode
 
 py -3.8-32 test.py -v # test picovna

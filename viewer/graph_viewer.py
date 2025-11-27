@@ -178,6 +178,25 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         self.target_ids = s21_data[7]
         self.thres = s21_data[8]
 
+        # Ensure freq and raw_dB have the same length to avoid pyqtgraph shape errors.
+        if self.freq.shape[0] != self.raw_dB.shape[0]:
+            n = min(self.freq.shape[0], self.raw_dB.shape[0])
+            try:
+                self.freq = self.freq[:n]
+            except Exception:
+                self.freq = np.array(self.freq).tolist()[:n]
+                self.freq = np.array(self.freq)
+            self.raw_dB = self.raw_dB[:n]
+            # Trim other arrays if present
+            if self.base_dB is not None and len(self.base_dB) > n:
+                self.base_dB = self.base_dB[:n]
+            if self.diff_dB is not None and len(self.diff_dB) > n:
+                self.diff_dB = self.diff_dB[:n]
+            if self.diff_w_filter_dB is not None and len(self.diff_w_filter_dB) > n:
+                self.diff_w_filter_dB = self.diff_w_filter_dB[:n]
+            # Make sure target_ids are within the new range
+            self.target_ids = self.target_ids[self.target_ids < n]
+
         self.target_freq = self.freq[self.target_ids]
 
         if self.is_recording:

@@ -140,8 +140,8 @@ class QtVNA(QWidget):
         self.bandwidth = self.parser.getint('VNA', 'bandwidth')
         self.end_freq = self.now_end_freq = self.start_freq + \
             self.freq_step * (self.step_num - 1)
-        self.freq = np.arange(
-            self.start_freq, self.end_freq + self.freq_step/2, self.freq_step)
+        # Use linspace to ensure exact number of points equals step_num
+        self.freq = np.linspace(self.start_freq, self.end_freq, num=self.step_num)
         self.dB, self.base_dB, self.diff_dB, self.diff_dB_w_filter, self.std_dB, self.peaks = \
             None, None, None, None, None, None
         self.fps = 0
@@ -181,8 +181,8 @@ class QtVNA(QWidget):
         self.bandwidth = self.parser.getint('VNA', 'bandwidth')
         self.end_freq = self.now_end_freq = self.start_freq + \
             self.freq_step * (self.step_num - 1)
-        self.freq = np.arange(
-            self.start_freq, self.end_freq + self.freq_step/2, self.freq_step)
+        # Use linspace so freq length exactly matches step_num (supports 51/101/201)
+        self.freq = np.linspace(self.start_freq, self.end_freq, num=self.step_num)
 
         self.vna = NanoVNA()
         self.vna.set_frequencies(
@@ -273,12 +273,33 @@ class QtVNA(QWidget):
         st = time.time()
         self.freq, self.dB = self._getRawS21()
 
+        # compute target index array (ensure we get a 1-D ndarray, not a tuple)
         self.target_ids = np.where(
-            (self.freq >= self.now_start_freq) & (self.freq <= self.now_end_freq))
+            (self.freq >= self.now_start_freq) & (self.freq <= self.now_end_freq))[0]
+        # Clip target indices to valid range for the current dB array to avoid out-of-bounds
+        if self.dB is not None:
+            try:
+                max_valid = self.dB.size - 1
+            except Exception:
+                max_valid = len(self.dB) - 1
+            self.target_ids = self.target_ids[(self.target_ids >= 0) & (
+                self.target_ids <= max_valid)]
         mt = time.time()
 
-        self.peaks, self.base_dB, self.diff_dB_w_filter, self.diff_dB = detect_peak_with_polyfit(
-            deg=4, thres=self.thres, y=self.dB[self.target_ids], x=self.freq[self.target_ids])
+        # slice target arrays
+        y_target = self.dB[self.target_ids]
+        x_target = self.freq[self.target_ids]
+
+        # If there are too few points to fit the polynomial (deg=4 requires >4 points),
+        # skip peak detection and return empty/default arrays to avoid indexing errors.
+        if y_target.size <= 4:
+            self.peaks = np.array([], dtype=int)
+            self.base_dB = np.zeros_like(y_target)
+            self.diff_dB_w_filter = np.zeros_like(y_target)
+            self.diff_dB = np.zeros_like(y_target)
+        else:
+            self.peaks, self.base_dB, self.diff_dB_w_filter, self.diff_dB = detect_peak_with_polyfit(
+                deg=4, thres=self.thres, y=y_target, x=x_target)
         et = time.time()
         if print_time:
             print("getRawS21: {:.0f}ms, detectPeak: {:.0f}ms".format(

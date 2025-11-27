@@ -87,17 +87,40 @@ class QtVNA(QWidget):
         print('Open VNA')
         # Read S-parameter mode from ini if available (S21 by default)
         self.sparam = 'S21'
+        # Initialize demo mode settings
+        self.demo_mode_enabled = False
+        self.demo_mode_bands = []  # List of (min_freq, max_freq, target_freq)
+        
         if self.inifile:
             try:
                 _p = ConfigParser()
                 _p.read(self.inifile)
                 self.sparam = _p.get('VNA', 'sparam', fallback='S21').strip().upper()
+                # Load demo mode settings
+                self.demo_mode_enabled = _p.getint('demo_mode', 'enabled', fallback=0) == 1
+                if self.demo_mode_enabled:
+                    bands_str = _p.get('demo_mode', 'bands', fallback='')
+                    if bands_str:
+                        # Parse bands: "27.25,27.36,27.3|27.45,27.55,27.5|..."
+                        for band in bands_str.split('|'):
+                            parts = band.strip().split(',')
+                            if len(parts) == 3:
+                                try:
+                                    min_f = float(parts[0].strip())
+                                    max_f = float(parts[1].strip())
+                                    target_f = float(parts[2].strip())
+                                    self.demo_mode_bands.append((min_f, max_f, target_f))
+                                except ValueError:
+                                    pass
             except Exception:
                 # fallback to default
                 self.sparam = 'S21'
+                self.demo_mode_enabled = False
         # Inform user which S-parameter is being used
         try:
             self.log_viewer.appendPlainText("Measurement parameter: {}".format(self.sparam))
+            if self.demo_mode_enabled:
+                self.log_viewer.appendPlainText("Demo mode: ENABLED with {} bands".format(len(self.demo_mode_bands)))
         except Exception:
             pass
         if self.logfile:

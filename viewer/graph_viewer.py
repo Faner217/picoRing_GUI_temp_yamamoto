@@ -19,6 +19,7 @@ class GraphViewer(pg.GraphicsLayoutWidget):
     def __init__(self, parent):
         super().__init__(parent)
         self.winID = parent.winId()
+        self.parent_window = parent  # Store reference to access vna settings
 
         self.font = QFont('Arial', 15)
 
@@ -154,6 +155,7 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         self.MAX_CNT = 50
         self.timeline_x = np.arange(0, self.MAX_CNT, 1)
         self.timeline_y = np.zeros(self.MAX_CNT)
+        self.timeline_y_initialized = False  # Track if we've initialized with proper no_peak_value
         self.peak_timeline.setData(self.timeline_x, self.timeline_y)
         self.timelineGraph.setXRange(0, self.MAX_CNT, padding=0.05)
         self.rawGraph.showGrid(x=True, y=True)
@@ -161,6 +163,36 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         self.timelineGraph.showGrid(x=True, y=True)
 
         self.is_running = True
+
+    def _apply_demo_mode_mapping(self, peak_freq, demo_mode_enabled, demo_mode_bands, no_peak_value):
+        """
+        Apply demo mode mapping to quantize peak frequency to predefined bands.
+        
+        Args:
+            peak_freq: detected peak frequency (or no_peak_value if no peak)
+            demo_mode_enabled: whether demo mode is enabled
+            demo_mode_bands: list of (min_freq, max_freq, target_freq) tuples
+            no_peak_value: value to return when no peak is detected
+        
+        Returns:
+            Mapped peak frequency, or no_peak_value if out of any band
+        """
+        if not demo_mode_enabled or not demo_mode_bands:
+            return peak_freq
+        
+        # Check if peak_freq matches no_peak_value (means no peak detected)
+        # Use a small tolerance for floating-point comparison
+        if abs(float(peak_freq) - float(no_peak_value)) < 0.001:
+            return no_peak_value
+        
+        # Search for matching band
+        for min_f, max_f, target_f in demo_mode_bands:
+            if min_f <= float(peak_freq) <= max_f:
+                return target_f
+        
+        # If no band matches, return no_peak_value
+        return no_peak_value
+
 
     def updateGraph(self, s21_data):
         if not self.is_running:
@@ -177,6 +209,11 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         self.vna_fps = s21_data[6]
         self.target_ids = s21_data[7]
         self.thres = s21_data[8]
+        
+        # Initialize timeline_y with proper no_peak_value on first update
+        if not self.timeline_y_initialized:
+            self.timeline_y = np.full(self.MAX_CNT, self.freq[0])
+            self.timeline_y_initialized = True
 
         # Ensure freq and raw_dB have the same length to avoid pyqtgraph shape errors.
         if self.freq.shape[0] != self.raw_dB.shape[0]:
@@ -239,8 +276,26 @@ class GraphViewer(pg.GraphicsLayoutWidget):
         if self.timelineGraphCheckBox.isChecked():
             self.timelineGraph.setYRange(
                 self.target_freq[0], self.target_freq[-1], padding=0.05)
+            # Get peak frequency or default value (take the first/strongest peak only)
+            if len(self.peaks) > 0:
+                # Convert peaks to numpy array to safely access first element
+                peaks_array = np.array(self.peaks) if not isinstance(self.peaks, np.ndarray) else self.peaks
+                peak_value = float(self.target_freq[peaks_array[0]])  # Get first peak as scalar
+            else:
+                peak_value = float(self.freq[0])  # No peak detected
+            
+            # Apply demo mode mapping if enabled
+            demo_mode_enabled = False
+            demo_mode_bands = []
+            if hasattr(self.parent_window, 'vna'):
+                demo_mode_enabled = getattr(self.parent_window.vna, 'demo_mode_enabled', False)
+                demo_mode_bands = getattr(self.parent_window.vna, 'demo_mode_bands', [])
+            
+            mapped_peak_value = self._apply_demo_mode_mapping(
+                peak_value, demo_mode_enabled, demo_mode_bands, float(self.freq[0]))
+            
             self.timeline_y[self.cnt %
-                            self.MAX_CNT] = self.target_freq[self.peaks] if len(self.peaks) else self.freq[0]
+                            self.MAX_CNT] = mapped_peak_value
             self.peak_timeline.setData(self.timeline_x, self.timeline_y)
             self.peak_scatter_in_timeline.setData([self.timeline_x[self.cnt %
                                                                    self.MAX_CNT]], [self.timeline_y[self.cnt %
